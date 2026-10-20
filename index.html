@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tengo una pregunta para ti 💌</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;700&family=Fraunces:opsz,wght@9..144,400;9..144,600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --fondo: #f7d6dc;
+    --papel: #fffaf6;
+    --tinta: #4a1f2b;
+    --suave: #8a5a66;
+    --rojo: #c8324f;
+    --rojo-hover: #a82640;
+    --gris: #e8dfe1;
+    --linea: #f0c4cd;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --fondo: #2a1419;
+      --papel: #3a1e25;
+      --tinta: #fbe9ec;
+      --suave: #d7aab4;
+      --rojo: #e8506d;
+      --rojo-hover: #f2708a;
+      --gris: #55363d;
+      --linea: #5a2f39;
+      color-scheme: dark;
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--fondo);
+    color: var(--tinta);
+    font-family: "Fraunces", Georgia, serif;
+    display: grid;
+    place-items: center;
+    padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+    overflow: hidden;
+  }
+
+  .carta {
+    position: relative;
+    width: min(440px, 100%);
+    background: var(--papel);
+    border-radius: 6px;
+    padding: 44px 32px 36px;
+    text-align: center;
+    box-shadow: 0 18px 40px -18px rgba(120, 20, 45, .45);
+    background-image: repeating-linear-gradient(transparent 0 33px, var(--linea) 33px 34px);
+    background-position: 0 22px;
+    transform: rotate(-1.2deg);
+  }
+  .sello {
+    position: absolute;
+    top: -22px; left: 50%;
+    transform: translateX(-50%) rotate(8deg);
+    font-size: 44px;
+  }
+  .saludo {
+    font-family: "Caveat", "Comic Sans MS", cursive;
+    font-size: 28px;
+    color: var(--suave);
+    margin: 0 0 4px;
+  }
+  h1 {
+    font-family: "Caveat", "Comic Sans MS", cursive;
+    font-weight: 700;
+    font-size: clamp(40px, 11vw, 56px);
+    line-height: 1.05;
+    margin: 0 0 14px;
+  }
+  .texto {
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--suave);
+    margin: 0 0 28px;
+  }
+
+  .botones {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    align-items: center;
+    min-height: 70px;
+  }
+  button {
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 600;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    padding: 12px 30px;
+    font-size: 18px;
+    transition: transform .2s ease, background .2s ease;
+  }
+  button:focus-visible { outline: 3px solid var(--rojo); outline-offset: 3px; }
+  #si {
+    background: var(--rojo);
+    color: #fff;
+  }
+  #si:hover { background: var(--rojo-hover); }
+  #no {
+    background: var(--gris);
+    color: var(--tinta);
+    white-space: nowrap;
+    z-index: 5;
+  }
+  #no.escapando {
+    position: absolute;
+    transition: left .25s ease, top .25s ease, transform .2s ease;
+  }
+
+  /* Pantalla final */
+  .final { display: none; }
+  .carta.dijo-si .pregunta { display: none; }
+  .carta.dijo-si .final { display: block; }
+  .final h1 { color: var(--rojo); }
+  .opciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 280px;
+    margin: 0 auto;
+  }
+  .opcion {
+    background: var(--papel);
+    color: var(--tinta);
+    border: 2px solid var(--rojo);
+    font-size: 17px;
+  }
+  .opcion:hover {
+    background: var(--rojo);
+    color: #fff;
+  }
+
+  .corazon {
+    position: fixed;
+    bottom: -40px;
+    pointer-events: none;
+    animation: subir linear forwards;
+    z-index: 10;
+  }
+  @keyframes subir {
+    to { transform: translateY(-115vh) rotate(25deg); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .corazon { display: none; }
+    #no.escapando { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="carta" id="carta">
+  <div class="sello" aria-hidden="true">💌</div>
+
+  <section class="pregunta">
+    <p class="saludo" style="font-size: 34px;">Hola Carla 🙈</p>
+    <h1>¿Quieres salir conmigo?</h1>
+    <p class="texto">Lo pensé mucho y tengo un plan perfecto. Solo falta tu respuesta.</p>
+    <div class="botones">
+      <button id="si" type="button">Sí</button>
+      <button id="no" type="button">No</button>
+    </div>
+  </section>
+
+  <section class="final" aria-live="polite">
+    <div id="paso-elegir">
+      <p class="saludo">Lo sabía…</p>
+      <h1>¡Es una cita! ❤️</h1>
+      <p class="texto">Hoy a las 8 te paso a buscar. Tú eliges a dónde vamos:</p>
+      <div class="opciones">
+        <button type="button" class="opcion" data-plan="a comer sushi" data-emoji="🍣">🍣 Comer sushi</button>
+        <button type="button" class="opcion" data-plan="a un mirador" data-emoji="🌄">🌄 Ir a un mirador</button>
+        <button type="button" class="opcion" data-plan="a un restaurante" data-emoji="🍽️">🍽️ Ir a un restaurante</button>
+      </div>
+    </div>
+    <div id="paso-listo" hidden>
+      <p class="saludo">Perfecto,</p>
+      <h1 id="plan-titulo">¡Nos vemos a las 8!</h1>
+      <p class="texto" id="plan-texto"></p>
+    </div>
+  </section>
+</main>
+
+<script>
+  const btnNo = document.getElementById("no");
+  const btnSi = document.getElementById("si");
+  const carta = document.getElementById("carta");
+
+  const frases = [
+    "No", "¿Segura?", "Piénsalo bien", "¿De verdad?", "Última oportunidad",
+    "No te creo", "Inténtalo otra vez", "Mejor di que sí", "Ya pues 🥺", "Nop, no se puede"
+  ];
+  let intentos = 0;
+  let escalaSi = 1;
+
+  function escapar(e) {
+    if (e) e.preventDefault();
+    intentos++;
+
+    // Cambia el texto del botón "No"
+    btnNo.textContent = frases[intentos % frases.length];
+
+    // Se mueve a otro lugar cercano, siempre dentro de la carta
+    if (!btnNo.classList.contains("escapando")) {
+      btnNo.style.left = btnNo.offsetLeft + "px";
+      btnNo.style.top = btnNo.offsetTop + "px";
+      btnNo.classList.add("escapando");
+      void btnNo.offsetWidth;
+    }
+    const actualX = parseFloat(btnNo.style.left);
+    const actualY = parseFloat(btnNo.style.top);
+    const margen = 12;
+    const maxX = carta.clientWidth - btnNo.offsetWidth - margen;
+    const maxY = carta.clientHeight - btnNo.offsetHeight - margen;
+    const si = { x: btnSi.offsetLeft, y: btnSi.offsetTop, w: btnSi.offsetWidth, h: btnSi.offsetHeight };
+
+    let x, y, prueba = 0;
+    do {
+      // Salto corto: entre 70 y 150 px en una dirección al azar
+      const angulo = Math.random() * Math.PI * 2;
+      const distancia = 70 + Math.random() * 80;
+      x = Math.min(maxX, Math.max(margen, actualX + Math.cos(angulo) * distancia));
+      y = Math.min(maxY, Math.max(margen, actualY + Math.sin(angulo) * distancia));
+      prueba++;
+      var tapaSi = x < si.x + si.w + 10 && x + btnNo.offsetWidth > si.x - 10 &&
+                   y < si.y + si.h + 10 && y + btnNo.offsetHeight > si.y - 10;
+      var muyCerca = Math.hypot(x - actualX, y - actualY) < 50;
+    } while (prueba < 30 && (tapaSi || muyCerca));
+    btnNo.style.left = x + "px";
+    btnNo.style.top = y + "px";
+
+    // El "No" se achica y el "Sí" crece
+    const escalaNo = Math.max(0.55, 1 - intentos * 0.05);
+    btnNo.style.transform = `scale(${escalaNo})`;
+    escalaSi = Math.min(1.5, escalaSi + 0.06);
+    btnSi.style.transform = `scale(${escalaSi})`;
+  }
+
+  // Computadora: se escapa al acercar el mouse. Celular: al tocarlo.
+  btnNo.addEventListener("mouseenter", escapar);
+  btnNo.addEventListener("touchstart", escapar, { passive: false });
+  btnNo.addEventListener("click", escapar);
+  btnNo.addEventListener("focus", () => btnNo.blur());
+
+  btnSi.addEventListener("click", () => {
+    carta.classList.add("dijo-si");
+    btnNo.style.display = "none";
+    lluviaDeCorazones();
+  });
+
+  document.querySelectorAll(".opcion").forEach(boton => {
+    boton.addEventListener("click", () => {
+      const plan = boton.dataset.plan;
+      const emoji = boton.dataset.emoji;
+      document.getElementById("paso-elegir").hidden = true;
+      document.getElementById("paso-listo").hidden = false;
+      document.getElementById("plan-titulo").textContent = `¡Vamos ${plan}! ${emoji}`;
+      document.getElementById("plan-texto").textContent =
+        "Esto es oficialmente una cita 🫣 Hoy a las 8 en punto paso por ti. Ponte linda (aunque ya lo eres).";
+      lluviaDeCorazones();
+    });
+  });
+
+  function lluviaDeCorazones() {
+    const emojis = ["❤️", "💖", "💕", "💘", "🌹"];
+    let n = 0;
+    const timer = setInterval(() => {
+      const c = document.createElement("span");
+      c.className = "corazon";
+      c.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      c.style.left = Math.random() * 100 + "vw";
+      c.style.fontSize = 18 + Math.random() * 26 + "px";
+      c.style.animationDuration = 3 + Math.random() * 3 + "s";
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 6500);
+      if (++n > 70) clearInterval(timer);
+    }, 90);
+  }
+
+  // Si cambia el tamaño de la ventana, mantiene el "No" dentro de la pantalla
+  window.addEventListener("resize", () => {
+    if (btnNo.classList.contains("escapando")) escapar();
+  });
+</script>
+</body>
+</html>
