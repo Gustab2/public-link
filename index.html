@@ -20,7 +20,7 @@
     color-scheme: light;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --fondo: #2a1419;
       --papel: #3a1e25;
       --tinta: #fbe9ec;
@@ -123,21 +123,76 @@
   .carta.dijo-si .final { display: block; }
   .final h1 { color: var(--rojo); }
   .opciones {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
-    max-width: 280px;
+    max-width: 380px;
     margin: 0 auto;
   }
   .opcion {
     background: var(--papel);
     color: var(--tinta);
     border: 2px solid var(--rojo);
-    font-size: 17px;
+    font-size: 15px;
+    padding: 10px 12px;
   }
   .opcion:hover {
     background: var(--rojo);
     color: #fff;
+  }
+
+  .cuenta {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+  }
+  .cuenta div {
+    background: var(--papel);
+    border: 2px solid var(--rojo);
+    border-radius: 10px;
+    min-width: 76px;
+    padding: 8px 6px 6px;
+  }
+  .cuenta span {
+    display: block;
+    font-family: "Caveat", "Comic Sans MS", cursive;
+    font-weight: 700;
+    font-size: 42px;
+    line-height: 1;
+    color: var(--rojo);
+    font-variant-numeric: tabular-nums;
+  }
+  .cuenta small {
+    display: block;
+    font-size: 13px;
+    color: var(--suave);
+    margin-top: 2px;
+  }
+
+  .cupon {
+    margin: 24px auto 0;
+    max-width: 320px;
+    border: 2px dashed var(--rojo);
+    border-radius: 12px;
+    padding: 14px 16px 12px;
+    transform: rotate(1.5deg);
+  }
+  .cupon-titulo {
+    font-family: "Caveat", "Comic Sans MS", cursive;
+    font-weight: 700;
+    font-size: 26px;
+    color: var(--rojo);
+    margin: 0 0 4px;
+  }
+  .cupon-texto {
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0 0 6px;
+  }
+  .cupon-letra {
+    font-size: 12px;
+    color: var(--suave);
+    margin: 0;
   }
 
   .corazon {
@@ -179,13 +234,22 @@
       <div class="opciones">
         <button type="button" class="opcion" data-plan="a comer sushi" data-emoji="🍣">🍣 Comer sushi</button>
         <button type="button" class="opcion" data-plan="a un mirador" data-emoji="🌄">🌄 Ir a un mirador</button>
-        <button type="button" class="opcion" data-plan="a un restaurante" data-emoji="🍽️">🍽️ Ir a un restaurante</button>
       </div>
     </div>
     <div id="paso-listo" hidden>
       <p class="saludo">Perfecto,</p>
       <h1 id="plan-titulo">¡Nos vemos a las 8!</h1>
       <p class="texto" id="plan-texto"></p>
+      <div class="cuenta" id="cuenta">
+        <div><span id="horas">00</span><small>horas</small></div>
+        <div><span id="minutos">00</span><small>min</small></div>
+        <div><span id="segundos">00</span><small>seg</small></div>
+      </div>
+      <div class="cupon">
+        <p class="cupon-titulo">🎟️ Cupón incluido 🎟️</p>
+        <p class="cupon-texto">Viene con abrazos coquetos ilimitados 😘😏🔥</p>
+        <p class="cupon-letra">Válido hoy y siempre ✨ No caduca 💌</p>
+      </div>
     </div>
   </section>
 </main>
@@ -267,8 +331,33 @@
       document.getElementById("plan-texto").textContent =
         "Esto es oficialmente una cita 🫣 Hoy a las 8 en punto paso por ti. Ponte linda (aunque ya lo eres).";
       lluviaDeCorazones();
+      iniciarCuenta();
     });
   });
+
+  // Cuenta regresiva hasta las 8 de la noche de hoy
+  let timerCuenta;
+  function iniciarCuenta() {
+    const objetivo = new Date();
+    objetivo.setHours(20, 0, 0, 0);
+    const dos = n => String(n).padStart(2, "0");
+    function actualizar() {
+      const resta = objetivo - new Date();
+      if (resta <= 0) {
+        clearInterval(timerCuenta);
+        document.getElementById("cuenta").innerHTML =
+          '<p class="saludo">¡Ya son las 8! Voy en camino 🚗</p>';
+        return;
+      }
+      const s = Math.floor(resta / 1000);
+      document.getElementById("horas").textContent = dos(Math.floor(s / 3600));
+      document.getElementById("minutos").textContent = dos(Math.floor(s % 3600 / 60));
+      document.getElementById("segundos").textContent = dos(s % 60);
+    }
+    clearInterval(timerCuenta);
+    timerCuenta = setInterval(actualizar, 1000);
+    actualizar();
+  }
 
   function lluviaDeCorazones() {
     const emojis = ["❤️", "💖", "💕", "💘", "🌹"];
